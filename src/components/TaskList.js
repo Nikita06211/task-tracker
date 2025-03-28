@@ -1,24 +1,37 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { Card, CardContent, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteTask } from "../utils/taskSlice";
+import TaskForm from "./TaskForm";
+import { List, ListItem, ListItemText, IconButton, Box } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
 
 const TaskList = () => {
   const tasks = useSelector(state => state.tasks.tasks);
-
+  const dispatch = useDispatch();
+  
+  const [editTask, setEditTask] = useState(tasks.length > 0 ? tasks[0] : null);
+  const [isEditing, setIsEditing] = useState(false); 
   return (
-    <div>
-      <h2>Task List</h2>
-      {tasks.map(task => (
-        <Card key={task.id} style={{ margin: "10px 0" }}>
-          <CardContent>
-            <Typography variant="h6">{task.title}</Typography>
-            <Typography>Status: {task.status}</Typography>
-            <Typography>Priority: {task.priority}</Typography>
-            <Typography>Due Date: {task.date}</Typography>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <Box>
+      <List>
+        {tasks.map(task => (
+          <ListItem key={task.id} secondaryAction={
+            <>
+              <IconButton edge="end" onClick={() => { setEditTask(task); setIsEditing(true); }}>
+                <Edit />
+              </IconButton>
+              <IconButton edge="end" onClick={() => dispatch(deleteTask(task.id))}>
+                <Delete color="error" />
+              </IconButton>
+            </>
+          }>
+            <ListItemText primary={task.title} secondary={`Priority: ${task.priority} | Due: ${task.date}`} />
+          </ListItem>
+        ))}
+      </List>
+
+      {isEditing && <TaskForm task={editTask} onClose={() => setIsEditing(false)} />}
+    </Box>
   );
 };
 
