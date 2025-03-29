@@ -1,20 +1,20 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
-import { moveTask } from "../utils/taskSlice";
+import { moveTask, deleteTask } from "../utils/taskSlice"; 
 import useEditTask from "../hooks/useEditTask";
 import useTaskFilterSort from "../hooks/useTaskFilterSort";
 import TaskForm from "./TaskForm";
 import SortFilterMenu from "./SortFilterMenu";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const TaskBoard = () => {
   const allTasks = useSelector(state => state.tasks.tasks);
   const dispatch = useDispatch();
   const { editTask, isEditing, startEditing, handleUpdate, cancelEditing } = useEditTask();
   const {
-    filteredTasks, filterStatus, setFilterStatus, filterPriority, setFilterPriority,
-    sortByDate, setSortByDate
+    filteredTasks, setFilterStatus, setFilterPriority, setSortByDate
   } = useTaskFilterSort(allTasks);
 
   const TaskItem = ({ task }) => {
@@ -29,16 +29,28 @@ const TaskBoard = () => {
     return (
       <Paper
         ref={drag}
-        onClick={() => startEditing(task)}
         sx={{
           padding: 1,
           margin: "5px",
           cursor: "grab",
           opacity: isDragging ? 0.5 : 1,
           backgroundColor: task.status === "completed" ? "#90EE90" : "#FFD700",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        {task.title}
+        <Typography sx={{ flexGrow: 1, cursor: "pointer" }} onClick={() => startEditing(task)}>
+          {task.title}
+        </Typography>
+
+        <IconButton
+          size="small"
+          onClick={() => dispatch(deleteTask(task.id))}
+          sx={{ color: "red" }}
+        >
+          <DeleteIcon />
+        </IconButton>
       </Paper>
     );
   };
@@ -58,11 +70,12 @@ const TaskBoard = () => {
         sx={{
           flex: 1,
           padding: 2,
+          margin: "10px",
+          backgroundColor: "#212529",
           minHeight: 250,
-          backgroundColor: isOver ? "#E0E0E0" : "#F5F5F5",
         }}
       >
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="h6" sx={{ color: "darkcyan" }}>{title}</Typography>
         {status === "tasks" && (
           <SortFilterMenu
             setSortByDate={setSortByDate}
@@ -70,7 +83,13 @@ const TaskBoard = () => {
             setFilterPriority={setFilterPriority}
           />
         )}
-        {tasks.map(task => <TaskItem key={task.id} task={task} />)}
+        {tasks.length > 0 ? (
+          tasks.map(task => <TaskItem key={task.id} task={task} />)
+        ) : (
+          <Typography variant="body2" sx={{ opacity: 0.6, color: "white", textAlign: "center" }}>
+            No tasks
+          </Typography>
+        )}
       </Paper>
     );
   };
@@ -80,7 +99,7 @@ const TaskBoard = () => {
       <TaskColumn status="tasks" title="Tasks" tasks={filteredTasks} />
       <TaskColumn status="pending" title="Pending" tasks={allTasks.filter(task => task.status === "pending")} />
       <TaskColumn status="completed" title="Completed" tasks={allTasks.filter(task => task.status === "completed")} />
-      
+
       {isEditing && <TaskForm task={editTask} onUpdate={handleUpdate} onClose={cancelEditing} />}
     </Box>
   );

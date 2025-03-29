@@ -15,11 +15,12 @@ const SortFilterMenu = ({ setSortByDate, setFilterStatus, setFilterPriority }) =
   return (
     <Box display="flex" justifyContent="space-between" sx={{ padding: "8px" }}>
       <Typography 
-        variant="h6" 
+        variant="body2" 
         onClick={handleSortClick}
         sx={{
           cursor: "pointer", 
-          backgroundColor: "#f0f0f0",
+          backgroundColor: "black",
+          color:"darkcyan",
           padding: "8px 12px", 
           borderRadius: "5px",
           "&:hover": { backgroundColor: "#e0e0e0" }
@@ -33,11 +34,12 @@ const SortFilterMenu = ({ setSortByDate, setFilterStatus, setFilterPriority }) =
       </Menu>
 
       <Typography 
-        variant="h6" 
+        variant="body2" 
         onClick={handleFilterClick}
         sx={{
           cursor: "pointer", 
-          backgroundColor: "#f0f0f0",
+          backgroundColor: "black",
+          color:"darkcyan",
           padding: "8px 12px", 
           borderRadius: "5px",
           "&:hover": { backgroundColor: "#e0e0e0" }
